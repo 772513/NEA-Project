@@ -29,6 +29,20 @@ __init__.py
                 -   testing
                 -   production
             =   clean and centralised management of settings, simplifying configurations for differnt environment
+            
+            -   Responsible for:
+                -   setting up the Flask app with configuration settings:
+                    -   datagbase URIs
+                    -   secret keys etc.
+                
+                -   Registering blueprints:
+                    -   authentication
+                    -   user management etc.
+                
+                -   Initialising extensions:
+                    -   Flask-SQLAlchemy
+                    -   Flask-Migrate
+                    -   Flask-Mail etc.
         
         5   Blueprints for Modular Design
             -   allows you to define routes and handlers in seperate modules and then register them with the main app
@@ -57,6 +71,17 @@ __init__.py
             -   easier to update specific parts of the application without affecting other parts
             =   Long-term maintainability is much easier when your code is organised
 
+        9   Flask App Factory Pattern
+            -   recommended pattern for creating Flask applications
+            -   factory function creates and configures the app instance and returns it
+            -   allows multiple instances of the app with different configurations
+            -   avoids issues with app instances being created at the module level, 
+                making testing and configuration management easier
+            -   creates a flexible application, 
+            -   you can easily switch configurations or environments without needing to modify the app setup each time
+            -   Maintainability:       
+                    Helps ensure that the app is easier to maintain and extend in the long term.
+
     Summary of Benefits:
 
         -   Improved Code Organization: 
@@ -82,9 +107,26 @@ __init__.py
         
         -   Separation of Concerns: 
                 Keeps the app's various components isolated and focused on specific tasks.
-        
-        -   Maintainability:       
-                Helps ensure that the app is easier to maintain and extend in the long term.
 
+requirements.txt
+
+    generating and updating:
+
+        $ pip freeze > requirements.txt
+        $ pip install -r requirements.txt
+
+        explanation:
+
+            pip freeze:
+                lists all installed packages in the current environment, along with their versions
+            
+            > requirements.txt
+                redirects the output of pip freeze into a requirements.txt file
+
+        notes:
+
+            use a venv to prevent including global packages
+
+  
 
 .
