@@ -1,10 +1,10 @@
 {% extends "base.html" %} 
 
 {% block content %}
-    <h1>Hello, {{ user.username }}!</h1>
+    <h1>Hi, {{ current_user.username }}!</h1>
     {% for match in matches %}
         <div>
-            <p>{{ match.opponent }} {{ match. date }} {{ match.location }}</p>
+            <p>{{ match.opponent }} {{ match.date }} {{ match.location }}</p>
         </div>
     {% endfor %} 
 {% endblock %}
