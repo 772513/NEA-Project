@@ -69,3 +69,14 @@ def register():
         flash("Congratulations, you are now a registered user!")
         return redirect(url_for("main.login"))
     return render_template("register.html", title="Register", form=form)
+
+
+@main.route("/user/<username>")
+@login_required
+def user(username):
+    user = db.first_or_404(sa.select(User).where(User.username == username))
+    matches = [
+        {"opponent": "opponent1", "location": "location1", "author": user},
+        {"opponent": "opponent2", "location": "location2", "author": user},
+    ]
+    return render_template("user.html", user=user, matches=matches)
