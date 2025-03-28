@@ -6,6 +6,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as so
 from config import Config
 
+
 # define extensions
 db = SQLAlchemy()
 migrate = Migrate()
@@ -28,7 +29,7 @@ def create_app():
     # this prevents circular imports
     from app.routes import main
     from app.models import User, Match
-    from app import models
+    from app import routes, models, errors
 
     @app.shell_context_processor
     def make_shell_context():
