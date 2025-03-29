@@ -1,12 +1,9 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from app import create_app
+from app import app, db
 from app.models import User, Match
 
-# create instance of Flask application
-app = create_app()
 
-
-# run app in development mode
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.shell_context_processor
+def make_shell_context():
+    return {'sa': sa, 'so': so, 'db': db, 'User': User, 'Match': Match}

@@ -1,3 +1,6 @@
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,34 +10,31 @@ import sqlalchemy.orm as so
 from config import Config
 
 
-# define extensions
-db = SQLAlchemy()
-migrate = Migrate()
-login = LoginManager()
+app = Flask(__name__)
+app.config.from_object(Config)
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+login = LoginManager(app)
+login.login_view = "login"
+
+if not app.debug:
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
+    file_handler = RotatingFileHandler(
+        "logs/skylog.log", maxBytes=10240, backupCount=10
+    )
+    file_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(linno)d]"
+        )
+    )
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Skylog startup')
 
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_object(Config)
-
-    # initiate extensions
-    db.init_app(app)
-    migrate.init_app(app, db)
-    login.init_app(app)
-
-    login.login_view = 'main.login'
-
-    # main is a blueprint defined in routes.py cointaing all the route definitions for that specific part of the app
-    # create_app() imports and registers the blueprint to the app after the app instance is created,
-    # this prevents circular imports
-    from app.routes import main
-    from app.models import User, Match
-    from app import routes, models, errors
-
-    @app.shell_context_processor
-    def make_shell_context():
-        return {"sa": sa, "so": so, "db": db, "User": User, "Match": Match}
-
-    app.register_blueprint(main)
-
-    return app
+from app import routes, models, errors

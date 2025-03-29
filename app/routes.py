@@ -1,18 +1,16 @@
+from datetime import datetime, timezone
+from urllib.parse import urlsplit
 from flask import render_template, flash, redirect, url_for, request
-from flask import Blueprint
-from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from app import db
+from app import app, db
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from app.models import User
-from urllib.parse import urlsplit
-from datetime import datetime, timezone
-
-main = Blueprint("main", __name__)
 
 
-@main.route("/")
-@main.route("/index")
+
+@app.route("/")
+@app.route("/index")
 @login_required
 def index():
     matches = [
@@ -25,10 +23,10 @@ def index():
     return render_template("index.html", title="Home", matches=matches)
 
 
-@main.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("main.index"))
+        return redirect(url_for("app.index"))
     form = LoginForm()
     if form.validate_on_submit():
         user = db.session.scalar(
@@ -36,25 +34,25 @@ def login():
         )
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password")
-            return redirect(url_for("main.login"))
+            return redirect(url_for("app.login"))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
         if not next_page or urlsplit(next_page).netloc != "":
-            next_page = url_for("main.index")
-        return redirect(url_for("main.index"))
+            next_page = url_for("app.index")
+        return redirect(url_for("app.index"))
     return render_template("login.html", title="Sign In", form=form)
 
 
-@main.route("/logout")
+@app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for("main.index"))
+    return redirect(url_for("app.index"))
 
 
-@main.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for("main.index"))
+        return redirect(url_for("app.index"))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(
@@ -67,11 +65,11 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash("Congratulations, you are now a registered user!")
-        return redirect(url_for("main.login"))
+        return redirect(url_for("app.login"))
     return render_template("register.html", title="Register", form=form)
 
 
-@main.route("/user/<username>")
+@app.route("/user/<username>")
 @login_required
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
@@ -81,13 +79,13 @@ def user(username):
     ]
     return render_template("user.html", user=user, matches=matches)
 
-@main.before_request
+@app.before_request
 def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
 
-@main.route('/edit_profile', methods=['GET', 'POST'])
+@app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = EditProfileForm()
@@ -95,7 +93,7 @@ def edit_profile():
         current_user.username = form.username.data
         db.session.commit()
         flash('Your changes have been saved.')
-        return redirect(url_for('main.edit_profile'))
+        return redirect(url_for('app.edit_profile'))
     elif request.method == 'GET':
         form.username.data = current_user.username
     return render_template('edit_profile.html', title='Edit Profile', form=form)
