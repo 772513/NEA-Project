@@ -50,6 +50,15 @@ class Match(db.Model):
         return "<Match {} {}>".format(self.location, self.timestamp)
 
 
+class Score(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    score: so.Mapped[int] = so.mapped_column(sa.Integer)
+    turn_number: so.Mapped[int] = so.mapped_column(sa.Integer, index=True)
+
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
+    match_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Match.id), index=True)
+
+
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
