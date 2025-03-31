@@ -19,7 +19,14 @@ class User(UserMixin, db.Model):
         default=lambda: datetime.now(timezone.utc)
     )
 
-    matches: so.WriteOnlyMapped["Match"] = so.relationship(back_populates="author")
+    user_scores: so.WriteOnlyMapped["Score"] = so.relationship(back_populates="user")
+
+    matches: so.WriteOnlyMapped["User"] = so.relationship(
+        secondary="score",
+        primaryjoin=("score.c.user_id" == id),
+        secondaryjoin=("score.c.match_id" == id),
+        back_populates="users",
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -34,6 +41,14 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return "<User {}>".format(self.username)
 
+    def get_scores(self):
+        return (
+            sa.select(Score)
+            .join(Score.match)
+            .join(Score.user)
+            .where(User.id == id)
+            .order_by(Match.timestamp.desc())
+        )
 
 class Match(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
@@ -42,9 +57,15 @@ class Match(db.Model):
     timestamp: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc)
     )
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
 
-    author: so.Mapped[User] = so.relationship(back_populates="matches")
+    match_scores: so.WriteOnlyMapped["Score"] = so.relationship(back_populates="match")
+
+    users: so.WriteOnlyMapped["Match"] = so.relationship(
+        secondary="score",
+        primaryjoin=("score.c.match_id" == id),
+        secondaryjoin=("score.c.user_id" == id),
+        back_populates="matches",
+    )
 
     def __repr__(self):
         return "<Match {} {}>".format(self.location, self.timestamp)
@@ -57,6 +78,9 @@ class Score(db.Model):
 
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
     match_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Match.id), index=True)
+
+    user: so.WriteOnlyMapped[User] = so.relationship(back_populates="user_scores")
+    match: so.WriteOnlyMapped[Match] = so.relationship(back_populates="match_scores")
 
 
 @login.user_loader
