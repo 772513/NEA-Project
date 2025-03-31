@@ -19,12 +19,17 @@ class User(UserMixin, db.Model):
         default=lambda: datetime.now(timezone.utc)
     )
 
-    user_scores: so.WriteOnlyMapped["Score"] = so.relationship(back_populates="user")
+    # relationship with Score (intermediary table between User and Match)
+    user_scores: so.Mapped["Score"] = so.relationship("Score", back_populates="user")
 
-    matches: so.WriteOnlyMapped["User"] = so.relationship(
+    # relationship with Match via Score
+    matches: so.Mapped["Match"] = so.relationship(
+        "Match",
+        # defines a many-to-many relationship, where the relationship is stored in a
+        # separate table (Score)
         secondary="score",
-        primaryjoin=("score.c.user_id" == id),
-        secondaryjoin=("score.c.match_id" == id),
+        # ensures that both sides of the relationship are synchronised, so that changes
+        # on one side will automatically reflect on the other side
         back_populates="users",
     )
 
@@ -41,14 +46,27 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return "<User {}>".format(self.username)
 
-    def get_scores(self):
-        return (
+    def get_all_scores(self):
+        query = (
             sa.select(Score)
             .join(Score.match)
             .join(Score.user)
-            .where(User.id == id)
+            .where(Score.user_id == self.id)
             .order_by(Match.timestamp.desc())
         )
+
+        result = db.session.execute(query).scalars().all()
+
+        return result
+
+    def get_score_from_id(self, id):
+        return sa.select(Score).where(Score.id == id)
+
+    def remove_score(self, score):
+        if score in self.get_all_scores():
+            db.session.delete(score)
+            db.session.commit()
+
 
 class Match(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
@@ -58,17 +76,26 @@ class Match(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc)
     )
 
-    match_scores: so.WriteOnlyMapped["Score"] = so.relationship(back_populates="match")
+    match_scores: so.Mapped["Score"] = so.relationship(back_populates="match")
 
-    users: so.WriteOnlyMapped["Match"] = so.relationship(
+    # relationship with User via Score
+    users: so.Mapped["User"] = so.relationship(
+        "User",
         secondary="score",
-        primaryjoin=("score.c.match_id" == id),
-        secondaryjoin=("score.c.user_id" == id),
         back_populates="matches",
     )
 
     def __repr__(self):
         return "<Match {} {}>".format(self.location, self.timestamp)
+
+    def get_scores(self):
+        return (
+            sa.select(Score)
+            .join(Score.match)
+            .join(Score.user)
+            .where(Score.match_id == self.id)
+            .order_by(Score.id)
+        )
 
 
 class Score(db.Model):
@@ -79,8 +106,8 @@ class Score(db.Model):
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
     match_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Match.id), index=True)
 
-    user: so.WriteOnlyMapped[User] = so.relationship(back_populates="user_scores")
-    match: so.WriteOnlyMapped[Match] = so.relationship(back_populates="match_scores")
+    user: so.Mapped[User] = so.relationship(back_populates="user_scores")
+    match: so.Mapped[Match] = so.relationship(back_populates="match_scores")
 
 
 @login.user_loader
