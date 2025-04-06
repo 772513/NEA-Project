@@ -35,7 +35,7 @@ class UserModelCase(unittest.TestCase):
                 "https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?d=identicon&s=128"
             ),
         )
-
+    
     def test_score(self):
         u = User(
             username="john", email="john@example.com", forename="john", surname="wick"

@@ -1,5 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import (
+    StringField,
+    PasswordField,
+    BooleanField,
+    SubmitField,
+    IntegerField,
+    DateField,
+)
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 import sqlalchemy as sa
 from app import db
@@ -45,3 +52,15 @@ class EditProfileForm(FlaskForm):
             )
             if user is not None:
                 raise ValidationError("Please use a different username.")
+
+
+class AddMatchForm(FlaskForm):
+    opponent = StringField("Opponent", validators=[DataRequired()])
+    location = StringField("Location", validators=[DataRequired()])
+    date = StringField("Date")
+    submit = SubmitField("Submit")
+
+
+class AddScoreForm(FlaskForm):
+    score = IntegerField("Score", validators=[DataRequired()])
+    submit = SubmitField("Enter")

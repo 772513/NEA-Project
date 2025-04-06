@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block content %}
+<form action="" method="POST">
+	{{ form.hidden_tag() }} {{ form.score.label }} {{ form.score() }}
+	<button type="submit">Enter Score</button>
+</form>
+
+<h2>Scores</h2>
+<ul>
+	{% for score in scores %}
+	<li>Turn {{ score.turn_number }}: {{ score.score }} (User: {{ score.user_id }})</li>
+	{% endfor %}
+</ul>
+{% endblock %}

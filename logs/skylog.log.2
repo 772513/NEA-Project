@@ -1,4 +1,4 @@
-2025-04-06 00:55:45,236 ERROR: Exception on /match/1 [POST] [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py:875]
+2025-04-05 20:07:43,573 ERROR: Exception on /match/1 [GET] [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py:875]
 Traceback (most recent call last):
   File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\sqlalchemy\sql\coercions.py", line 803, in _literal_coercion
     return expr._bind_param(operator, element, type_=bindparam_type)
@@ -22,7 +22,7 @@ Traceback (most recent call last):
     raise exc.ArgumentError(
         "Object %r is not legal as a SQL literal value" % (value,)
     )
-sqlalchemy.exc.ArgumentError: Object <User Ivansia> is not legal as a SQL literal value
+sqlalchemy.exc.ArgumentError: Object <Match location1 2025-04-05 14:55:06.587725> is not legal as a SQL literal value
 
 The above exception was the direct cause of the following exception:
 
@@ -36,9 +36,9 @@ Traceback (most recent call last):
   File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\routes.py", line 139, in match
-    .filter(Score.match_id == match.id, Score.user_id == current_user)
-                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\routes.py", line 135, in match
+    .where(Score.match_id == id)
+           ^^^^^^^^^^^^^^^^^^^^
   File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\sqlalchemy\sql\operators.py", line 584, in __eq__
     return self.operate(eq, other)
            ~~~~~~~~~~~~^^^^^^^^^^^
@@ -82,9 +82,10 @@ Traceback (most recent call last):
     ^
   File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\sqlalchemy\sql\coercions.py", line 518, in _raise_for_expected
     raise exc.ArgumentError(msg, code=code) from err
-sqlalchemy.exc.ArgumentError: SQL expression element or literal value expected, got <User Ivansia>.
-2025-04-06 00:57:20,890 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
-2025-04-06 01:02:13,835 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
-2025-04-06 01:07:25,071 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
-2025-04-06 01:07:31,319 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
-2025-04-06 01:07:51,361 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
+sqlalchemy.exc.ArgumentError: SQL expression element or literal value expected, got <Match location1 2025-04-05 14:55:06.587725>.
+2025-04-05 20:15:26,288 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
+2025-04-05 20:17:05,526 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
+2025-04-06 00:46:35,961 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
+2025-04-06 00:51:10,065 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
+2025-04-06 00:54:39,367 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
+2025-04-06 00:55:24,481 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]

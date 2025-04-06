@@ -14,13 +14,4 @@
             </td>
         </tr>
     </table>
-    <hr />
-    {% for match in matches %}
-    <table>
-        <tr valign="top">
-            <td><img src="{{ match.author.avatar(36) }}" alt="user profile image"></td>
-            <td>{{ match.opponent }} {{ match.date }} {{ match.location }}</td>
-        </tr>
-    </table>
-    {% endfor %} 
 {% endblock %}

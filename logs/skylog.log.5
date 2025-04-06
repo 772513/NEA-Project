@@ -1,0 +1,110 @@
+2025-04-05 19:07:57,654 ERROR: Exception on /matches [GET] [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\routes.py", line 127, in matches
+    return render_template("matches.html", title="Matches", matches=matches, form=form)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\templates\matches.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\templates\base.html", line 32, in top-level template code
+    {% endif %} {% endwith %} {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\templates\matches.html", line 40, in block 'content'
+    <a href="{{ url_for('match', id=match.id) }}">
+    ^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'match' with values ['id']. Did you mean 'matches' instead?
+2025-04-05 19:20:00,610 ERROR: Exception on /matches [GET] [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\routes.py", line 127, in matches
+    return render_template("matches.html", title="Matches", matches=matches, form=form)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\templates\matches.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\templates\base.html", line 32, in top-level template code
+    {% endif %} {% endwith %} {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\templates\matches.html", line 40, in block 'content'
+    <a href="{{ url_for('match', id=match.id) }}">
+    ^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'match' with values ['id']. Did you mean 'matches' instead?
+2025-04-05 19:56:28,775 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
+2025-04-05 19:56:32,486 ERROR: Exception on /matches [GET] [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py:875]
+Traceback (most recent call last):
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\venv\Lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\routes.py", line 127, in matches
+    return render_template("matches.html", title="Matches", match=match, matches=matches, form=form)
+                                                                  ^^^^^
+UnboundLocalError: cannot access local variable 'match' where it is not associated with a value
+2025-04-05 19:59:06,854 INFO: Skylog startup [in C:\Users\tenni\OneDrive\Documents\python\NEA-Project\skylog\app\__init__.py:37]
