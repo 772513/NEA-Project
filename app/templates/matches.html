@@ -1,63 +1,36 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/matches.js') }}?v={{ timestamp }}"></script>
+{% endblock %}
+
 {% block content %}
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <h3>Add Match</h3>
-        <p>
-            {{ form.opponent.label }}
-            {{ form.opponent(size=32) }} 
-            {% for error in form.opponent.errors %}
-            <span style="color:red;">[{{ error }}]</span>
-            {% endfor %}
-            
-            <br>
+    <a href="{{ url_for('match_form') }}" class="btn btn-primary">Add New Match</a>
 
-            {{ form.location.label }}
-            {{ form.location(size=32) }} 
-            {% for error in form.location.errors %}
-            <span style="color:red;">[{{ error }}]</span>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Opponent</th>
+                <th>Location</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matches %}
+            <tr>
+                <td>{{ match.opponent }}</td>
+                <td>{{ match.location }}</td>
+                <td>{{ match.timestamp.strftime("%Y-%m-%d %H:%M") if match.timestamp else "N/A" }}</td>
+                <td>
+                    <a href="{{ url_for('match_form', match_id=match.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                    <a href="{{ url_for('match', id=match.id) }}" class="btn btn-sm btn-info">View</a>
+                    <form action="{{ url_for('delete_match', match_id=match.id) }}" method="POST" style="display: inline;" onsubmit="return confirmDelete(event);">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
             {% endfor %}
-        
-            <br>
-
-            {{ form.date.label }}
-            {{ form.date(size=32) }}
-            {% for error in form.date.errors %}
-            <span style="color:red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }} </p>
-    </form>
-
-    <table>
-        <tr>
-            <th>Opponent</th>
-            <th>Location</th>
-            <th>Date</th>
-            <th>Match</th>
-            <th>Edit</th>
-        </tr>
-        {% for match in matches %}
-        <tr valign="top">
-            <td>{{ match.opponent }} </td> 
-            <td>{{ match.location }} </td>
-            <td>{{ match.timestamp.strftime('%Y-%m-%d %H:%M') }} </td>
-            <td>
-                <button>
-                    <a href="{{ url_for('match', id=match.id) }}">
-                        Scores
-                    </a>
-                </button>
-            </td>
-            <td>
-                <button>
-                    <a href="{{ url_for('edit_match', id=match.id) }}">
-                        Edit
-                    </a>
-                </button>
-            </td>
-        </tr>
-        {% endfor %}
+        </tbody>
     </table>
 {% endblock %}

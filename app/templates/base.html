@@ -9,6 +9,8 @@
 		{% else %}
 		<title>Welcome to Skylog!</title>
 		{% endif %}
+        
+        {% block scripts %} {% endblock %}
 	</head>
 	<body>
 		<div>
@@ -23,12 +25,15 @@
 			{% endif %}
 		</div>
 		<hr />
-		{% with messages = get_flashed_messages() %} {% if messages %}
-		<ul>
-			{% for message in messages %}
-			<li>{{ message }}</li>
-			{% endfor %}
-		</ul>
-		{% endif %} {% endwith %} {% block content %}{% endblock %}
+		{% with messages = get_flashed_messages() %} 
+            {% if messages %}
+                <div class="alert alert-success">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+		    {% endif %} 
+        {% endwith %} 
+        {% block content %}{% endblock %}
 	</body>
 </html>

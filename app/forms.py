@@ -61,19 +61,11 @@ class EditProfileForm(FlaskForm):
                 raise ValidationError("Please use a different username.")
 
 
-class AddMatchForm(FlaskForm):
+class CRMatchForm(FlaskForm):
     opponent = StringField("Opponent", validators=[DataRequired()])
     location = StringField("Location", validators=[DataRequired()])
-    date = StringField("Date")
-    submit = SubmitField("Submit")
-
-
-class EditMatchForm(FlaskForm):
-    id = StringField("Match ID")
-    opponent = StringField("Opponent")
-    location = StringField("Location")
-    date = StringField("Date")
-    submit = SubmitField("Submit")
+    date = StringField("Date (YYYY-MM-DD HH:MM)", validators=[DataRequired()])
+    submit = SubmitField("Save Match")
 
 
 class AddScoreForm(FlaskForm):
@@ -91,5 +83,7 @@ class EditScoresForm(FlaskForm):
     turn_7 = IntegerField("Turn 7", validators=[Optional(), NumberRange(min=0, max=27)])
     turn_8 = IntegerField("Turn 8", validators=[Optional(), NumberRange(min=0, max=27)])
     turn_9 = IntegerField("Turn 9", validators=[Optional(), NumberRange(min=0, max=27)])
-    turn_10 = IntegerField("Turn 10", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_10 = IntegerField(
+        "Turn 10", validators=[Optional(), NumberRange(min=0, max=27)]
+    )
     submit = SubmitField("Save All Scores")

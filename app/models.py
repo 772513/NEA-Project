@@ -76,7 +76,9 @@ class Match(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc)
     )
 
-    match_scores: so.Mapped["Score"] = so.relationship(back_populates="match")
+    match_scores: so.Mapped["Score"] = so.relationship(
+        "Score", back_populates="match", cascade="all, delete"
+    )
 
     # relationship with User via Score
     users: so.Mapped["User"] = so.relationship(

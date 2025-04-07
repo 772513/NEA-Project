@@ -3,13 +3,13 @@ from urllib.parse import urlsplit
 from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
+import sqlalchemy.orm
 from app import app, db
 from app.forms import (
     LoginForm,
     RegistrationForm,
     EditProfileForm,
-    AddMatchForm,
-    EditMatchForm,
+    CRMatchForm,
     AddScoreForm,
     EditScoresForm,
 )
@@ -96,55 +96,86 @@ def edit_profile():
 
 @app.route("/")
 @app.route("/index")
-@app.route("/matches", methods=["GET", "POST"])
+@app.route("/matches")
 @login_required
 def matches():
-    form = AddMatchForm()
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    all_matches = Match.query.order_by(Match.timestamp.desc()).all()
+    return render_template("matches.html", matches=all_matches, title="Matches", timestamp=timestamp)
+
+
+@app.route("/matches/delete/<int:match_id>", methods=["POST"])
+@login_required
+def delete_match(match_id):
+    try:
+        print(f"Deleting match iwth ID: {match_id}")
+        match = Match.query.get_or_404(match_id)
+
+        print(f"Found match: {match.id}")
+
+        if isinstance(match.match_scores, list):
+            for score in match.match_scores:
+                db.session.delete(score)
+                print(f"Deleted score with ID: {score.id}")
+        else:
+            db.session.delete(match.match_scores)
+            print(f"Deleted score with ID: {match.match_score.id}")
+        
+        db.session.delete(match)
+        print(f"Deleted match with ID: {match.id}")
+
+        db.session.commit()
+        print("Commit successful")
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        db.session.rollback()
+        flash("An error occurred while deleting the match. Please try again.", "error")
+        return redirect(url_for("matches"))
+    
+    flash("Match deleted successfully!", "success")
+    return redirect(url_for("matches"))
+
+
+@app.route("/match", methods=["GET", "POST"])
+@app.route("/match/edit/<int:match_id>", methods=["GET", "POST"])
+@login_required
+def match_form(match_id=None):
+    match = Match.query.get(match_id) if match_id else None
+    form = CRMatchForm(obj=match)
+
     if form.validate_on_submit():
         try:
             date = datetime.strptime(form.date.data, "%Y-%m-%d %H:%M")
-        except ValueError:
-            date = None
-        match = Match(
-            opponent=form.opponent.data,
-            location=form.location.data,
-            timestamp=date,
-        )
-        db.session.add(match)
-        db.session.commit()
+        except (ValueError, TypeError):
+            flash("Invalid date format. Please use YYYY-MM-DD HH:MM", "danger")
+            return render_template("edit_match.html", form=form, match=match)
 
+        if match:
+            # editing existing match
+            match.opponent = form.opponent.data
+            match.location = form.location.data
+            match.timestamp = date
+            flash("Match updated!", "success")
+        else:
+            # creating new match
+            match = Match(
+                opponent=form.opponent.data,
+                location=form.location.data,
+                timestamp=date,
+            )
+            db.session.add(match)
+            flash("New match created!", "success")
+
+        db.session.commit()
         return redirect(url_for("matches"))
 
-    matches = Match.query.all()
-    return render_template("matches.html", title="Matches", matches=matches, form=form)
+    if request.method == "GET" and match:
+        form.opponent.data = match.opponent
+        form.location.data = match.location
+        form.date.data = match.timestamp.strftime("%Y-%m-%d %H:%M") if match.timestamp else ""
 
-
-@app.route("/match/edit/<int:id>", methods=["GET", "POST"])
-@login_required
-def edit_match(id):
-    match = Match.query.get_or_404(id)
-    form = EditMatchForm()
-
-    if form.validate_on_submit():
-        match.opponent = form.opponent.data
-        match.location = form.location.data
-        match.timestamp = datetime.strptime(form.date.data, "%Y-%m-%d %H:%M")
-
-        try:
-            db.session.commit()
-            flash("Match updated succesfully!", "success")
-            return redirect(url_for("matches"))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Error updating match: {str(e)}", "danger")
-
-    form.opponent.data = match.opponent
-    form.location.data = match.location
-    form.date.data = match.timestamp.strftime("%Y-%m-%d %H:%M")
-
-    return render_template(
-        "edit_match.html", form=form, match=match, title=f"Edit Match {id}"
-    )
+    return render_template("edit_match.html", form=form, match=match)
 
 
 @app.route("/match/<int:id>", methods=["GET", "POST"])
@@ -214,8 +245,12 @@ def match(id):
     turns = {}
     for username in scores:
         turns[username] = []
-        turn_numbers = [scores[username][i].turn_number for i in range(0, len(scores[username]))]
-        temp_scores = [scores[username][i].score for i in range(0, len(scores[username]))]
+        turn_numbers = [
+            scores[username][i].turn_number for i in range(0, len(scores[username]))
+        ]
+        temp_scores = [
+            scores[username][i].score for i in range(0, len(scores[username]))
+        ]
 
         offset = 1
         for turn in range(1, 11):
