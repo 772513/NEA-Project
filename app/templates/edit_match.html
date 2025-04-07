@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <h3>Edit Match</h3>
+    <p>
+        {{ form.opponent.label }}
+        {{ form.opponent(size=32) }} 
+        {% for error in form.opponent.errors %}
+        <span style="color:red;">[{{ error }}]</span>
+        {% endfor %}
+        
+        <br>
+
+        {{ form.location.label }}
+        {{ form.location(size=32) }} 
+        {% for error in form.location.errors %}
+        <span style="color:red;">[{{ error }}]</span>
+        {% endfor %}
+    
+        <br>
+
+        {{ form.date.label }}
+        {{ form.date(size=32) }}
+        {% for error in form.date.errors %}
+        <span style="color:red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }} </p>
+</form>
+
+<a href="{{ url_for('match', id=match.id) }}">Cancel</a>
+{% endblock %}

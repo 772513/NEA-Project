@@ -7,7 +7,14 @@ from wtforms import (
     IntegerField,
     DateField,
 )
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms.validators import (
+    ValidationError,
+    DataRequired,
+    Email,
+    EqualTo,
+    NumberRange,
+    Optional,
+)
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -61,6 +68,28 @@ class AddMatchForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
+class EditMatchForm(FlaskForm):
+    id = StringField("Match ID")
+    opponent = StringField("Opponent")
+    location = StringField("Location")
+    date = StringField("Date")
+    submit = SubmitField("Submit")
+
+
 class AddScoreForm(FlaskForm):
-    score = IntegerField("Score", validators=[DataRequired()])
+    score = IntegerField("Add Score", validators=[DataRequired()])
     submit = SubmitField("Enter")
+
+
+class EditScoresForm(FlaskForm):
+    turn_1 = IntegerField("Turn 1", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_2 = IntegerField("Turn 2", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_3 = IntegerField("Turn 3", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_4 = IntegerField("Turn 4", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_5 = IntegerField("Turn 5", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_6 = IntegerField("Turn 6", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_7 = IntegerField("Turn 7", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_8 = IntegerField("Turn 8", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_9 = IntegerField("Turn 9", validators=[Optional(), NumberRange(min=0, max=27)])
+    turn_10 = IntegerField("Turn 10", validators=[Optional(), NumberRange(min=0, max=27)])
+    submit = SubmitField("Save All Scores")

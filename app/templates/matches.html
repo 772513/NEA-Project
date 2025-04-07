@@ -3,23 +3,26 @@
 {% block content %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
+        <h3>Add Match</h3>
         <p>
             {{ form.opponent.label }}
             {{ form.opponent(size=32) }} 
             {% for error in form.opponent.errors %}
             <span style="color:red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>
+            
+            <br>
+
             {{ form.location.label }}
             {{ form.location(size=32) }} 
             {% for error in form.location.errors %}
             <span style="color:red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>
+        
+            <br>
+
             {{ form.date.label }}
-            {{ form.date(size=32) }} 
+            {{ form.date(size=32) }}
             {% for error in form.date.errors %}
             <span style="color:red;">[{{ error }}]</span>
             {% endfor %}
@@ -29,21 +32,31 @@
 
     <table>
         <tr>
-            <th>ID</th>
             <th>Opponent</th>
             <th>Location</th>
             <th>Date</th>
+            <th>Match</th>
+            <th>Edit</th>
         </tr>
         {% for match in matches %}
         <tr valign="top">
-            <td>
-                <a href="{{ url_for('match', id=match.id) }}">
-                    {{ match.id }}
-                </a>
-            </td>
             <td>{{ match.opponent }} </td> 
             <td>{{ match.location }} </td>
             <td>{{ match.timestamp.strftime('%Y-%m-%d %H:%M') }} </td>
+            <td>
+                <button>
+                    <a href="{{ url_for('match', id=match.id) }}">
+                        Scores
+                    </a>
+                </button>
+            </td>
+            <td>
+                <button>
+                    <a href="{{ url_for('edit_match', id=match.id) }}">
+                        Edit
+                    </a>
+                </button>
+            </td>
         </tr>
         {% endfor %}
     </table>
