@@ -113,13 +113,14 @@ def delete_match(match_id):
 
         print(f"Found match: {match.id}")
 
-        if isinstance(match.match_scores, list):
-            for score in match.match_scores:
-                db.session.delete(score)
-                print(f"Deleted score with ID: {score.id}")
-        else:
-            db.session.delete(match.match_scores)
-            print(f"Deleted score with ID: {match.match_score.id}")
+        if match.match_scores:
+            if isinstance(match.match_scores, list):
+                for score in match.match_scores:
+                    db.session.delete(score)
+                    print(f"Deleted score with ID: {score.id}")
+            else:
+                db.session.delete(match.match_scores)
+                print(f"Deleted score with ID: {match.match_score.id}")
         
         db.session.delete(match)
         print(f"Deleted match with ID: {match.id}")
