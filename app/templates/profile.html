@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Profile</h2>
+<form method="POST">
+    {{ profile_form.hidden_tag() }}
+    <div class="form-group">
+        {{ profile_form.username.label }} {{ profile_form.username(size=32) }}
+    </div>
+    <div class="form-group">
+        {{ profile_form.email.label }} {{ profile_form.email(size=32) }}
+    </div>
+    <button type="submit" name="update_profile">{{ profile_form.submit.label }}</button>
+</form>
+
+<hr>
+
+<h2>Change Password</h2>
+<form method="POST">
+    {{ password_form.hidden_tag() }}
+    <div class="form-group">
+        {{ password_form.current_password.label }} {{ password_form.current_password(size=32) }}
+    </div>
+    <div class="form-group">
+        {{ password_form.new_password.label }} {{ password_form.new_password(size=32) }}
+    </div>
+    <div class="form-group">
+        {{ password_form.confirm_new_password.label }} {{ password_form.confirm_new_password(size=32) }}
+    </div>
+    <button type="submit" name="change_password">{{ password_form.submit.label }}</button>
+</form>
+<form action="{{ url_for('delete_user', user_id=current_user.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your account?')">
+    <button type="submit" class="btn btn-danger mt-3">Delete My Account</button>
+</form>
+{% endblock %}

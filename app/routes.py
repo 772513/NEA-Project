@@ -2,15 +2,17 @@ from datetime import datetime, timezone
 from urllib.parse import urlsplit
 from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user, login_user, logout_user, login_required
+from werkzeug.security import check_password_hash, generate_password_hash
 import sqlalchemy as sa
 import sqlalchemy.orm
+from sqlalchemy.orm import joinedload
 from app import app, db
 from app.forms import (
     LoginForm,
     RegistrationForm,
-    EditProfileForm,
+    UpdateProfileForm,
+    ChangePasswordForm,
     CRMatchForm,
-    AddScoreForm,
     EditScoresForm,
 )
 from app.models import User, Score, Match
@@ -27,6 +29,9 @@ def login():
         )
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password")
+            return redirect(url_for("login"))
+        if not user.is_active:
+            flash("This account has been deactivated.", "danger")
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
@@ -65,12 +70,65 @@ def register():
 @app.route("/user/<username>")
 @login_required
 def user(username):
-    user = db.first_or_404(sa.select(User).where(User.username == username))
-    matches = [
-        {"opponent": "opponent1", "location": "location1", "author": user},
-        {"opponent": "opponent2", "location": "location2", "author": user},
-    ]
-    return render_template("user.html", user=user, matches=matches)
+    user = (
+        db.session.execute(sa.select(User).where(User.username == username))
+        .scalars()
+        .first()
+    )
+
+    if current_user == user:
+        profile_form = UpdateProfileForm(obj=current_user)
+        password_form = ChangePasswordForm()
+    else:
+        profile_form = None
+        password_form = None
+
+    if (
+        profile_form
+        and profile_form.validate_on_submit()
+        and "update_profile" in request.form
+    ):
+        current_user.username = profile_form.username.data
+        current_user.email = profile_form.email.data
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for("user", username=current_user.username))
+
+    if (
+        password_form
+        and password_form.validate_on_submit()
+        and "change_password" in request.form
+    ):
+        if not check_password_hash(
+            current_user.password, password_form.current_password.data
+        ):
+            flash("Current password is incorrect.", "danger")
+        else:
+            current_user.password = generate_password_hash(
+                password_form.new_password.data
+            )
+            db.session.commit()
+            flash("Password changed successfully!", "success")
+            return redirect(url_for("user"))
+
+    matches = (
+        db.session.execute(
+            sa.select(Match)
+            .join(Score)
+            .where(Score.user_id == user.id)
+            .order_by(Match.timestamp.desc())
+            .distinct()
+        )
+        .scalars()
+        .all()
+    )
+    return render_template(
+        "user.html",
+        user=user,
+        matches=matches,
+        profile_form=profile_form,
+        password_form=password_form,
+    )
 
 
 @app.before_request
@@ -80,18 +138,50 @@ def before_request():
         db.session.commit()
 
 
-@app.route("/edit_profile", methods=["GET", "POST"])
+@app.route("/profile", methods=["GET", "POST"])
 @login_required
-def edit_profile():
-    form = EditProfileForm(current_user.username)
-    if form.validate_on_submit():
-        current_user.username = form.username.data
+def profile():
+    profile_form = UpdateProfileForm(obj=current_user)
+    password_form = ChangePasswordForm()
+
+    if profile_form.validate_on_submit() and "update_profile" in request.form:
+        current_user.username = profile_form.username.data
+        current_user.email = profile_form.email.data
         db.session.commit()
-        flash("Your changes have been saved.")
-        return redirect(url_for("edit_profile"))
-    elif request.method == "GET":
-        form.username.data = current_user.username
-    return render_template("edit_profile.html", title="Edit Profile", form=form)
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for("profile"))
+
+    if password_form.validate_on_submit() and "change_password" in request.form:
+        if not current_user.check_password(password_form.current_password.data):
+            flash("Current password is incorrect.", "danger")
+        else:
+            current_user.set_password(password_form.new_password.data)
+            db.session.commit()
+            flash("Password changed successfully!", "success")
+            return redirect(url_for("profile"))
+
+    return render_template(
+        "profile.html",
+        profile_form=profile_form,
+        password_form=password_form,
+    )
+
+
+@app.route("/user/delete/<int:user_id>", methods=["POST"])
+@login_required
+def delete_user(user_id):
+    if user_id != current_user.id:
+        flash("you are not authorised to delete this account.", "datnger")
+        return redirect(url_for("user", username=current_user.username))
+
+    user = current_user
+
+    # dactivate account
+    user.is_active = False
+    db.session.commit()
+
+    flash("Your account has been deleted.", "success")
+    return redirect(url_for("matches"))
 
 
 @app.route("/")
@@ -99,9 +189,11 @@ def edit_profile():
 @app.route("/matches")
 @login_required
 def matches():
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     all_matches = Match.query.order_by(Match.timestamp.desc()).all()
-    return render_template("matches.html", matches=all_matches, title="Matches", timestamp=timestamp)
+    return render_template(
+        "matches.html", matches=all_matches, title="Matches", timestamp=timestamp
+    )
 
 
 @app.route("/matches/delete/<int:match_id>", methods=["POST"])
@@ -113,15 +205,15 @@ def delete_match(match_id):
 
         print(f"Found match: {match.id}")
 
-        if match.match_scores:
-            if isinstance(match.match_scores, list):
-                for score in match.match_scores:
-                    db.session.delete(score)
-                    print(f"Deleted score with ID: {score.id}")
-            else:
-                db.session.delete(match.match_scores)
-                print(f"Deleted score with ID: {match.match_score.id}")
-        
+        # if match.match_scores:
+        #     if isinstance(match.match_scores, list):
+        for score in match.match_scores:
+            db.session.delete(score)
+            print(f"Deleted score with ID: {score.id}")
+            # else:
+            #     db.session.delete(match.match_scores)
+            #     print(f"Deleted score with ID: {match.match_score.id}")
+
         db.session.delete(match)
         print(f"Deleted match with ID: {match.id}")
 
@@ -133,7 +225,7 @@ def delete_match(match_id):
         db.session.rollback()
         flash("An error occurred while deleting the match. Please try again.", "error")
         return redirect(url_for("matches"))
-    
+
     flash("Match deleted successfully!", "success")
     return redirect(url_for("matches"))
 
@@ -174,7 +266,9 @@ def match_form(match_id=None):
     if request.method == "GET" and match:
         form.opponent.data = match.opponent
         form.location.data = match.location
-        form.date.data = match.timestamp.strftime("%Y-%m-%d %H:%M") if match.timestamp else ""
+        form.date.data = (
+            match.timestamp.strftime("%Y-%m-%d %H:%M") if match.timestamp else ""
+        )
 
     return render_template("edit_match.html", form=form, match=match)
 

@@ -1,2 +1,8 @@
-FLASK_APP=run.py
+FLASK_APP='run.py'
 FLASK_DEBUG=1
+MAIL_SERVER='smtp.gmail.com'
+MAIL_PORT=587
+MAIL_USER_TLS=True
+MAIL_USERNAME='yamaid0ll@gmail.com'
+MAIL_PASSWORD='HOSHIGUMA-ARK'
+MAIL_DEFAULT_SENDER='yamaid0ll@gmail.com'

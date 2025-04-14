@@ -18,6 +18,9 @@ class User(UserMixin, db.Model):
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(
         default=lambda: datetime.now(timezone.utc)
     )
+    is_active: so.Mapped[bool] = so.mapped_column(
+        sa.Boolean(), nullable=False, server_default=sa.text("1")
+    )
 
     # relationship with Score (intermediary table between User and Match)
     user_scores: so.Mapped["Score"] = so.relationship("Score", back_populates="user")
@@ -77,7 +80,7 @@ class Match(db.Model):
     )
 
     match_scores: so.Mapped["Score"] = so.relationship(
-        "Score", back_populates="match", cascade="all, delete"
+        "Score", back_populates="match", lazy=True, cascade="all, delete"
     )
 
     # relationship with User via Score

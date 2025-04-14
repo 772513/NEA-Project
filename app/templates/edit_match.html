@@ -1,34 +1,38 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
 
 {% block content %}
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    <h3>Edit Match</h3>
-    <p>
-        {{ form.opponent.label }}
-        {{ form.opponent(size=32) }} 
+<form action="" method="post" class="mt-4">
+	{{ form.hidden_tag() }}
+
+	<h3 class="mb-4">Edit Match</h3>
+
+	<div class="mb-3">
+		{{ form.opponent.label(class="form-label") }} 
+        {{ form.opponent(class="form-control", size=32) }} 
         {% for error in form.opponent.errors %}
-        <span style="color:red;">[{{ error }}]</span>
-        {% endfor %}
-        
-        <br>
+		    <div class="text-danger small">[{{ error }}]</div>
+		{% endfor %}
+    </div>
 
-        {{ form.location.label }}
-        {{ form.location(size=32) }} 
+    <div class="mb-3">
+		{{ form.location.label(class="form-label") }} 
+        {{ form.location(class="form-control", size=32) }} 
         {% for error in form.location.errors %}
-        <span style="color:red;">[{{ error }}]</span>
-        {% endfor %}
-    
-        <br>
+		    <span class="text-danger small">[{{ error }}]</span>
+		{% endfor %}
+    </div>
 
-        {{ form.date.label }}
-        {{ form.date(size=32) }}
+	<div class="mb-3">
+		{{ form.date.label(class="form-label") }} 
+        {{ form.date(class="form-control", size=32) }} 
         {% for error in form.date.errors %}
-        <span style="color:red;">[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>{{ form.submit() }} </p>
-</form>
+		    <span class="text-danger small">[{{ error }}]</span>
+		{% endfor %}
+    </div>
 
-<a href="{{ url_for('matches', id=match.id) }}">Cancel</a>
+    <div class="d-flex gap-2">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="javascript:history.back()" class="bt btn-secondary">Cancel</a>
+    </div>
+</form>
 {% endblock %}

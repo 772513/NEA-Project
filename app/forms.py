@@ -14,6 +14,7 @@ from wtforms.validators import (
     EqualTo,
     NumberRange,
     Optional,
+    Length,
 )
 import sqlalchemy as sa
 from app import db
@@ -28,11 +29,11 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired()])
+    username = StringField("Username", validators=[DataRequired(), Length(min=1, max=50)])
     email = StringField("Email", validators=[DataRequired(), Email()])
     forename = StringField("Forename", validators=[DataRequired()])
     surname = StringField("Surname", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
     password_check = PasswordField(
         "Repeat Password", validators=[DataRequired(), EqualTo("password")]
     )
@@ -44,21 +45,19 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("Please use a different username.")
 
 
-class EditProfileForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired()])
-    submit = SubmitField("Submit")
+class UpdateProfileForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired(), Length(min=1, max=50)])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Update Profile")
 
-    def __init__(self, original_username, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.original_username = original_username
-
-    def validate_username(self, username):
-        if username.data != self.original_username:
-            user = db.session.scalar(
-                sa.select(User).where(User.username == username.data)
-            )
-            if user is not None:
-                raise ValidationError("Please use a different username.")
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField("current Password", validators=[DataRequired()])
+    new_password = PasswordField("New Password", validators=[DataRequired(), Length(min=6)])
+    confirm_new_password = PasswordField("Confirm New Password", validators=[
+        DataRequired(),
+        EqualTo("new_password", message="Passwords must match.")
+    ])
+    submit = SubmitField("Change Password")
 
 
 class CRMatchForm(FlaskForm):

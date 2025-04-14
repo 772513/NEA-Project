@@ -1,36 +1,21 @@
 {% extends "base.html" %}
+{% from "macros.html" import matches_table %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/matches.js') }}?v={{ timestamp }}"></script>
 {% endblock %}
 
 {% block content %}
-    <a href="{{ url_for('match_form') }}" class="btn btn-primary">Add New Match</a>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>All Matches</h2>
+        <a href="{{ url_for('match_form') }}" class="btn btn-primary">Add New Match</a>
+    </div>
 
-    <table class="table table-striped mt-3">
-        <thead>
-            <tr>
-                <th>Opponent</th>
-                <th>Location</th>
-                <th>Timestamp</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for match in matches %}
-            <tr>
-                <td>{{ match.opponent }}</td>
-                <td>{{ match.location }}</td>
-                <td>{{ match.timestamp.strftime("%Y-%m-%d %H:%M") if match.timestamp else "N/A" }}</td>
-                <td>
-                    <a href="{{ url_for('match_form', match_id=match.id) }}" class="btn btn-sm btn-secondary">Edit</a>
-                    <a href="{{ url_for('match', id=match.id) }}" class="btn btn-sm btn-info">View</a>
-                    <form action="{{ url_for('delete_match', match_id=match.id) }}" method="POST" style="display: inline;" onsubmit="return confirmDelete(event);">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{ matches_table(matches, show_edit=True, show_delete=True) }}
+        </div>
+    </div>
+</div>
 {% endblock %}
